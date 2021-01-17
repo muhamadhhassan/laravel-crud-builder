@@ -1,0 +1,29 @@
+{
+  "name": "muhamadhhassan/laravel-crud-build",
+  "description": "A package that help creating Laravel essential CRUDs operations",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Muhammad Hassan",
+      "email": "muhamadhhassan@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CrudBuilder\\": "src",
+      "CrudBuilder\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "6.0",
+    "phpunit/phpunit": "^9.5"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "CrudBuilder\\Providers\\CrudBuilderServiceProvider"
+      ]
+    }
+  }
+}
