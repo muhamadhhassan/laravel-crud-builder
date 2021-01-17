@@ -1,0 +1,13 @@
+<?php
+
+namespace DummyNamespace;
+
+use CrudBuilder\Controllers\CRUDController;
+
+class DummyClass extends CRUDController
+{
+    public function setup()
+    {
+        // setup your resource
+    }
+}
