@@ -52,7 +52,7 @@ abstract class CRUDController extends Controller
         $fields = $this->crudBuilder->createInputs;
         $saveAction = $this->crudBuilder->getRouteName();
 
-        return view('admin.crud.create', compact('pageTitle', 'pageDescription', 'fields', 'saveAction'));
+        return view(config('crudbuilder.pages.create'), compact('pageTitle', 'pageDescription', 'fields', 'saveAction'));
     }
 
     public function store(Request $request)
@@ -88,7 +88,7 @@ abstract class CRUDController extends Controller
         $fields = $this->crudBuilder->updateInputs;
         $updateAction = $this->crudBuilder->getRouteName()."/$id";
 
-        return view('admin.crud.edit', compact('resource', 'pageTitle', 'pageDescription', 'fields', 'updateAction'));
+        return view(config('crudbuilder.pages.edit'), compact('resource', 'pageTitle', 'pageDescription', 'fields', 'updateAction'));
     }
 
     public function update(Request $request, $id)
