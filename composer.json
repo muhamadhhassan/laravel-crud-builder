@@ -1,5 +1,5 @@
 {
-  "name": "muhamadhhassan/laravel-crud-build",
+  "name": "muhamadhhassan/laravel-crud-builder",
   "description": "A package that help creating Laravel essential CRUDs operations",
   "type": "library",
   "license": "MIT",
