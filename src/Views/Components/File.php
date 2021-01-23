@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\View\Component;
 
@@ -25,6 +25,6 @@ class File extends Component
      */
     public function render()
     {
-        return view('components.file');
+        return view('crudbuilder::components.file');
     }
 }

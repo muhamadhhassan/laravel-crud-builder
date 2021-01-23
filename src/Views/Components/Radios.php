@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -49,7 +49,7 @@ class Radios extends InputComponent
      */
     public function render()
     {
-        return view('components.radios');
+        return view('crudbuilder::components.radios');
     }
 
     public function isSelected($value)

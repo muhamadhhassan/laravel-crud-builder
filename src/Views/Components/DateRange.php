@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,6 +40,6 @@ class DateRange extends InputComponent
      */
     public function render()
     {
-        return view('components.date-range');
+        return view('crudbuilder::components.date-range');
     }
 }

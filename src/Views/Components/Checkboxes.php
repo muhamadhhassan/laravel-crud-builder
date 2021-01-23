@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -49,7 +49,7 @@ class Checkboxes extends InputComponent
      */
     public function render()
     {
-        return view('components.checkboxes');
+        return view('crudbuilder::components.checkboxes');
     }
 
     public function isChecked($value)

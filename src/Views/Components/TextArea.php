@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +33,6 @@ class TextArea extends InputComponent
      */
     public function render()
     {
-        return view('components.text-area');
+        return view('crudbuilder::components.text-area');
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\View\Component;
 
 class Text extends InputComponent
 {
@@ -41,6 +40,6 @@ class Text extends InputComponent
      */
     public function render()
     {
-        return view('components.text');
+        return view('crudbuilder::components.text');
     }
 }

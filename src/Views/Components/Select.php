@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\View\Components;
+namespace CrudBuilder\Views\Components;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -49,6 +49,6 @@ class Select extends InputComponent
      */
     public function render()
     {
-        return view('components.select');
+        return view('crudbuilder::components.select');
     }
 }
