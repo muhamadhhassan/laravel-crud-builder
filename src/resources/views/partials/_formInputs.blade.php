@@ -1,6 +1,6 @@
 @foreach ($fields as $field)
   <x-dynamic-component
-    component="crudbuilder::{{ $field->type }}"
+    component="crudbuilder::inputs.{{ $field->type }}"
     :resource="$resource ?? null"
     :type="$field->textType"
     :options="$field->options"

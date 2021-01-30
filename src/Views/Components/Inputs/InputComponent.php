@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\Views\Components;
+namespace CrudBuilder\Views\Components\Inputs;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\Component;

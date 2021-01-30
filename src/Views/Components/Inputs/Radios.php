@@ -1,10 +1,10 @@
 <?php
 
-namespace CrudBuilder\Views\Components;
+namespace CrudBuilder\Views\Components\Inputs;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Select extends InputComponent
+class Radios extends InputComponent
 {
     /**
      * The options array of the input.
@@ -49,6 +49,11 @@ class Select extends InputComponent
      */
     public function render()
     {
-        return view('crudbuilder::components.select');
+        return view(config('crudbuilder.views.inputs.radios'));
+    }
+
+    public function isSelected($value)
+    {
+        return $value == $this->selected;
     }
 }

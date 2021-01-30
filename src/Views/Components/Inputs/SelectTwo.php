@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\Views\Components;
+namespace CrudBuilder\Views\Components\Inputs;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -65,7 +65,7 @@ class SelectTwo extends InputComponent
      */
     public function render()
     {
-        return view('crudbuilder::components.select-two');
+        return view(config('crudbuilder.views.inputs.select-two'));
     }
 
     public function isSelected($value)

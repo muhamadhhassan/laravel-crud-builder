@@ -1,11 +1,18 @@
 <?php
 
-namespace CrudBuilder\Views\Components;
+namespace CrudBuilder\Views\Components\Inputs;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TextArea extends InputComponent
+class DateRange extends InputComponent
 {
+    /**
+     * The default value of the input.
+     *
+     * @var string
+     */
+    public $value;
+
     /**
      * Create a new component instance.
      *
@@ -33,6 +40,6 @@ class TextArea extends InputComponent
      */
     public function render()
     {
-        return view('crudbuilder::components.text-area');
+        return view(config('crudbuilder.views.inputs.date-range'));
     }
 }

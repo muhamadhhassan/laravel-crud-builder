@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudBuilder\Views\Components;
+namespace CrudBuilder\Views\Components\Inputs;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,6 +40,6 @@ class TextEditor extends InputComponent
      */
     public function render()
     {
-        return view('crudbuilder::components.text-editor');
+        return view(config('crudbuilder.views.inputs.text-editor'));
     }
 }
