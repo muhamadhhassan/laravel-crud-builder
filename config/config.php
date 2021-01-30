@@ -2,6 +2,20 @@
 
 return [
 
+    'layouts' => [
+        
+        /**
+         * The blade stack that a component dependencies will be appended to
+         * The stacks must be defined in your application header (for styles)
+         * and at the end of the body tag
+         * more information about stacks here: https://laravel.com/docs/8.x/blade#stacks
+         */
+        'stacks' => [
+            'scripts' => 'crud-builder-scripts',
+            'styles' => 'crud-builder-styles',
+        ],
+    ],
+
     'views' => [
 
         /**
