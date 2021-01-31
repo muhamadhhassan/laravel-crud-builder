@@ -4,7 +4,7 @@
   @endif
   <div></div>
   <div class="custom-file">
-    <input type="file" class="custom-file-input" id="{{ $attributes['id'] ?? Str::random(5) }}" name="{{ $attributes['name'] }}">
+    <input type="file" class="custom-file-input" id="{{ $attributes['id'] }}" name="{{ $attributes['name'] }}">
     <label class="custom-file-label" for="{{ $attributes['name'] }}">Choose file</label>
   </div>
   @isset($error)

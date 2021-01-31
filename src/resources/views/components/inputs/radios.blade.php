@@ -9,7 +9,7 @@
           type="radio"
           name="{{ $name }}"
           value="{{ $key }}"
-          id="{{ $attributes['id'] ?? Str::random(5) }}"
+          id="{{ $attributes['id'] }}"
           @if($isSelected($key)) checked @endif
         >
         <span></span>

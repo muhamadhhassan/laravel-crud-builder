@@ -4,7 +4,7 @@
   @endif
   <select 
     class="{{ 'form-control kt-select2 select2 ' . $attributes['class'] }}"
-    id="{{ $attributes['id'] ?? Str::random(5) }}"
+    id="{{ $attributes['id'] }}"
     name="{{ $name }}[]"
     multiple
     @if($attributes['disabled']) disabled @endif

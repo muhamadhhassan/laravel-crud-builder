@@ -4,7 +4,7 @@
   @endif
   <select
     class="{{ 'form-control ' . $attributes['class']}}"
-    id="{{ $attributes['id'] ?? Str::random(5) }}"
+    id="{{ $attributes['id'] }}"
     name="{{ $name }}"
     @if($attributes['disabled']) disabled @endif
   >

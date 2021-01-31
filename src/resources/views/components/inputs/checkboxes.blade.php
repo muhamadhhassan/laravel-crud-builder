@@ -8,7 +8,7 @@
         <input 
           type="checkbox"
           name="{{ $name }}"
-          id="{{ $attributes['id'] ?? Str::random(5) }}"
+          id="{{ $attributes['id'] }}"
           value="{{ $key }}"
           @if($isChecked($key)) checked @endif
         >

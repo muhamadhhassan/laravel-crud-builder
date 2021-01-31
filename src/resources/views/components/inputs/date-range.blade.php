@@ -8,7 +8,7 @@
       readonly="readonly"
       placeholder="Select date range"
       name="{{ $name }}"
-      id="{{ $attributes['id'] ?? Str::random(5) }}"
+      id="{{ $attributes['id'] }}"
     >
     <div class="input-group-append">
       <span class="input-group-text">

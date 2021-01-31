@@ -7,7 +7,7 @@
     :taggable="$field->taggable"
     :name="$field->name"
     class="{{ $errors->get($field->name) ? 'is-invalid' : '' }}"
-    :id="$field->name"
+    :id="$field->id ?? Str::random(5)"
     :label="$field->label"
     :placeholder="$field->placeholder"
     :help-text="$field->helpText"

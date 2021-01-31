@@ -8,7 +8,7 @@
     placeholder="{{ $attributes['placeholder'] }}"
     name="{{ $name }}"
     value="{{ isset($value) && $attributes['type'] == 'date' ? $value->format('Y-m-d') : $value }}"
-    id="{{ $attributes['id'] ?? Str::random(5) }}"
+    id="{{ $attributes['id'] }}"
     @if($attributes['readonly']) readonly @endif
     @if($attributes['disabled']) disabled @endif
   >
