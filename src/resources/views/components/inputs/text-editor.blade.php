@@ -16,10 +16,6 @@
   @endisset
 </div>
 
-@prepend(config('crudbuilder.layouts.stacks.styles'))
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
-@endprepend
-
 @prepend(config('crudbuilder.layouts.stacks.scripts'))
   <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
 

@@ -25,3 +25,11 @@
     <span class="form-text text-muted">{{ $helpText }}</span>
   @endisset
 </div>
+
+@prepend(config('crudbuilder.layouts.stacks.scripts'))
+  <script>
+    $(document).ready(function() {
+      $('{{ '#'.$attributes['id'] }}').daterangepicker();
+    });
+  </script>
+@endprepend
