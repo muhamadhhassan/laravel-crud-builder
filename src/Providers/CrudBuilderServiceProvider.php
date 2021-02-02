@@ -20,6 +20,10 @@ class CrudBuilderServiceProvider extends ServiceProvider
             __DIR__.'/../../config/config.php' => config_path('crudbuilder.php'),
         ], 'config');
 
+        $this->publishes([
+            __DIR__.'/../../src/resources/views/layouts/partials' => resource_path('views/layouts/crudbuilder'),
+        ], 'views');
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'crudbuilder');
 
         Blade::componentNamespace('CrudBuilder\\Views\\Components', 'crudbuilder');
