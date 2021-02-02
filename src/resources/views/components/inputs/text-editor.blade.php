@@ -2,12 +2,10 @@
   @if($attributes['label'])
     <x-crudbuilder::utils.input-label :label="$attributes['label']" :name="$name" :mandatory="$mandatory"/>
   @endif
-  <div 
-    id="{{ $attributes['id'] }}"
-    class="{{ $attributes['class'] }}">
+  <div id="{{ $attributes['id'] }}" class="{{ $attributes['class'] }}">
     {!! $value !!}
   </div>
-  <input type="hidden" name="{{ $name }}" id="{{ $attributes['id'].'value' }}">
+  <input type="hidden" name="{{ $name }}" id="{{ $attributes['id'].'-'.'value' }}">
   @isset($error)
     <div class="invalid-feedback">{{ $error }}</div>
   @endisset
@@ -17,8 +15,6 @@
 </div>
 
 @prepend(config('crudbuilder.layouts.stacks.scripts'))
-  <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       var quill = new Quill('{{ '#' . $attributes['id'] }}', {
@@ -35,7 +31,8 @@
             ['clean']                                         // remove formatting button
           ]
         },
-        theme: 'snow'
+        theme: 'snow',
+        placeholder: '{{ $attributes['placeholder'] }}'
       });
 
       $("{{'#'.$attributes['id'].'value'}}").val(quill.container.firstChild.innerHTML);
