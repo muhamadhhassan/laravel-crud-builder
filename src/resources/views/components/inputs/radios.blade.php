@@ -2,14 +2,14 @@
   @if($attributes['label'])
     <x-crudbuilder::utils.input-label :label="$attributes['label']" :name="$name" :mandatory="$mandatory"/>
   @endif
-  <div class="{{ 'radio-' . $attributes['type'] }}">
+  <div class="{{ $attributes['class'] }}">
     @foreach ($options as $key => $option)    
       <label class="{{ 'radio ' . $attributes['size'] }}">
         <input 
           type="radio"
           name="{{ $name }}"
           value="{{ $key }}"
-          id="{{ $attributes['id'] }}"
+          id="{{ $attributes['id'].'-'.$key }}"
           @if($isSelected($key)) checked @endif
         >
         <span></span>
