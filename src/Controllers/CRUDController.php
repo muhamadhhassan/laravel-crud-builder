@@ -38,7 +38,7 @@ abstract class CRUDController extends Controller
         $data['canCreate'] = $this->crudBuilder->can('create');
         $data['canEdit'] = $this->crudBuilder->can('edit');
         $data['canDelete'] = $this->crudBuilder->can('delete');
-        $collection = $this->crudBuilder->resource::all();
+        $collection = $this->crudBuilder->resource::paginate(10);
 
         return view('admin.crud.index', compact('data', 'collection'));
     }

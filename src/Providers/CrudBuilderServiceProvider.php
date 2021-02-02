@@ -3,6 +3,7 @@
 namespace CrudBuilder\Providers;
 
 use CrudBuilder\Console\Install;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use CrudBuilder\Console\MakeController;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +17,8 @@ class CrudBuilderServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Paginator::useBootstrap();
+        
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('crudbuilder.php'),
         ], 'config');

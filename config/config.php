@@ -44,13 +44,14 @@ return [
         ],
 
         /**
-         * This determines the view of the utilities component
+         * This determines the view of the utilities components
          * It is used in the component class
          */
         'utils' => [
             'error-message' => 'crudbuilder::components.utils.error-message',
             'help-text' => 'crudbuilder::components.utils.help-text',
             'input-label' => 'crudbuilder::components.utils.input-label',
+            'index-table' => 'crudbuilder::components.utils.index-table',
         ],
     ],
 
