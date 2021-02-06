@@ -3,7 +3,7 @@
     <x-crudbuilder::utils.input-label :label="$attributes['label']" :name="$name" :mandatory="$mandatory"/>
   @endif
   <input
-    type="{{ $attributes['type'] }}"
+    type="{{ $type }}"
     class="{{ 'form-control ' . $attributes['class'] }}"
     placeholder="{{ $attributes['placeholder'] }}"
     name="{{ $name }}"
