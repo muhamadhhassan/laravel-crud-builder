@@ -2,68 +2,51 @@
 
 namespace CrudBuilder\Traits;
 
-use CrudBuilder\Helpers\SyncedEntity;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 trait SyncedRelation
 {
     /**
-     * The many to many relations that will require syncing.
-     *
-     * @var array
-     */
-    public $syncedEntities = [];
-
-    /**
-     * Add a relation to the synced relation collection.
-     *
-     * @param string $className
-     * @param array $properties
-     * @param array $pivotProperties
-     * @param string $relation
-     * @return \CRUDBuilder
-     */
-    public function addSyncedEntity(string $className, array $properties, array $pivotProperties, string $relation, bool $taggable = false)
-    {
-        if (! class_exists($className)) {
-            throw new \Exception("The model '{$className}' does not exist.", 500);
-        }
-
-        if (! is_subclass_of((new $className()), 'Illuminate\Database\Eloquent\Model')) {
-            throw new \Exception("The class '{$className}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
-        }
-
-        array_push($this->syncedEntities, new SyncedEntity($className, $properties, $pivotProperties, $relation, $taggable));
-
-        return $this;
-    }
-
-    /**
      * Return an array of relations' names.
      *
      * @return array
      */
-    public function getSyncedRelations()
+    public function getSyncedRelationsNames(array $entities)
     {
-        return collect($this->syncedEntities)
+        return collect($entities)
             ->map(function ($entity) {
                 return $entity->relation;
             })->toArray();
     }
 
-    public function attach(Model $resource, array $attachments)
+    /**
+     * Attach the given records to the specified resource
+     *
+     * @param \Illuminate\Database\Eloquent\Model $resource
+     * @param array $attachments
+     * 
+     * @return void
+     */
+    public function attach(Model $resource, array $attachments, array $syncedEntities)
     {
         foreach ($attachments as $relation => $attachment) {
-            $ids = $this->getIds($relation, $attachment);
+            $ids = $this->getIds($relation, $attachment, $syncedEntities);
             $resource->$relation()->attach($ids);
         }
     }
 
-    public function sync(Model $resource, array $attachments)
+    /**
+     * Sync the given records to the specified resource
+     *
+     * @param \Illuminate\Database\Eloquent\Model $resource
+     * @param array $attachments
+     * @return void
+     */
+    public function sync(Model $resource, array $attachments, array $syncedEntities)
     {
         foreach ($attachments as $relation => $attachment) {
-            $ids = $this->getIds($relation, $attachment);
+            $ids = $this->getIds($relation, $attachment, $syncedEntities);
             $resource->$relation()->sync($ids);
         }
     }
@@ -75,9 +58,9 @@ trait SyncedRelation
      * @param array $inputIds
      * @return array
      */
-    protected function getIds(string $relation, array $inputIds): array
+    protected function getIds(string $relation, array $inputIds, array $syncedEntities): array
     {
-        $syncedEntity = collect($this->syncedEntities)->filter(function ($entity) use ($relation) {
+        $syncedEntity = collect($syncedEntities)->filter(function ($entity) use ($relation) {
             return $entity->relation === $relation;
         })->first();
 
@@ -92,6 +75,14 @@ trait SyncedRelation
         return $filteredIds;
     }
 
+    /**
+     * Get the value of a property on the related entity.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $entity
+     * @param string $relation
+     * @param string $property
+     * @return void
+     */
     public function getParentProperty(Model $entity, string $relation, $property)
     {
         $parent = collect($this->syncedEntities)

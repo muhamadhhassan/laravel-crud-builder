@@ -5,10 +5,11 @@ namespace CrudBuilder\Services;
 use CrudBuilder\CRUDBuilder;
 use CrudBuilder\Traits\FilesHandler;
 use CrudBuilder\Traits\PasswordsHandler;
+use CrudBuilder\Traits\SyncedRelation;
 
 class CreateRecordService
 {
-    use FilesHandler, PasswordsHandler;
+    use FilesHandler, PasswordsHandler, SyncedRelation;
 
     /**
      * Undocumented variable
@@ -41,12 +42,12 @@ class CreateRecordService
             return redirect()->back()->withErrors($validator);
         }
 
-        $syncedRelation = $this->builder->getSyncedRelations();
+        $syncedRelation = $this->getSyncedRelationsNames($this->builder->syncedEntities);
         $filesNames = $this->getFilesNames($this->builder->createInputs);
         $input = $this->hashPasswords($this->builder->createInputs, $request->except($syncedRelation + $filesNames));
         $resource = $this->builder->resourceClass::create($input);
         
-        $this->builder->attach($resource, $request->only($syncedRelation));
+        $this->attach($resource, $request->only($syncedRelation), $this->builder->syncedEntities);
         $this->saveFiles($filesNames, $this->builder->resourceNamePlural, $resource, $request);
 
         return redirect($this->builder->route)->with('success', $this->builder->resourceName.' was created successfully');

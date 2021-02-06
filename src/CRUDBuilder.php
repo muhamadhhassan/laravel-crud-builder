@@ -2,14 +2,12 @@
 
 namespace CrudBuilder;
 
-use CrudBuilder\Traits\SyncedRelation;
+use CrudBuilder\Helpers\SyncedEntity;
 use CrudBuilder\Traits\RequestValidator;
 use CrudBuilder\Exceptions\InvalidArgumentException;
-
 class CRUDBuilder
 {
-    use RequestValidator, SyncedRelation;
-
+    use RequestValidator;
     /**
      * The resource class for example App\Models\User.
      *
@@ -86,6 +84,13 @@ class CRUDBuilder
      * @var string
      */
     public $updateRequest;
+
+    /**
+     * The many-to-many relations that will require syncing.
+     *
+     * @var array
+     */
+    public $syncedEntities = [];
 
     /**
      * The columns that will be in the index page.
@@ -264,6 +269,30 @@ class CRUDBuilder
                 throw new \Exception('Index table columns must be an instance of App\Helpers\CRUD\IndexColumn.php.', 500);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Add a relation to the synced relation collection.
+     *
+     * @param string $className
+     * @param array $properties
+     * @param array $pivotProperties
+     * @param string $relation
+     * @return \CRUDBuilder
+     */
+    public function addSyncedEntity(string $className, array $properties, array $pivotProperties, string $relation, bool $taggable = false)
+    {
+        if (! class_exists($className)) {
+            throw new InvalidArgumentException("The model '{$className}' does not exist.", 500);
+        }
+
+        if (! is_subclass_of((new $className()), 'Illuminate\Database\Eloquent\Model')) {
+            throw new InvalidArgumentException("The class '{$className}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
+        }
+
+        array_push($this->syncedEntities, new SyncedEntity($className, $properties, $pivotProperties, $relation, $taggable));
 
         return $this;
     }
