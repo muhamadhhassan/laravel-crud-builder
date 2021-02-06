@@ -4,10 +4,11 @@ namespace CrudBuilder\Services;
 
 use CrudBuilder\CRUDBuilder;
 use CrudBuilder\Traits\FilesHandler;
+use CrudBuilder\Traits\PasswordsHandler;
 
 class CreateRecordService
 {
-    use FilesHandler;
+    use FilesHandler, PasswordsHandler;
 
     /**
      * Undocumented variable
@@ -42,9 +43,9 @@ class CreateRecordService
 
         $syncedRelation = $this->builder->getSyncedRelations();
         $filesNames = $this->getFilesNames($this->builder->createInputs);
-        $input = $request->except($syncedRelation + $filesNames);
+        $input = $this->hashPasswords($this->builder->createInputs, $request->except($syncedRelation + $filesNames));
         $resource = $this->builder->resourceClass::create($input);
-
+        
         $this->builder->attach($resource, $request->only($syncedRelation));
         $this->saveFiles($filesNames, $this->builder->resourceNamePlural, $resource, $request);
 

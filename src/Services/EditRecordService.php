@@ -4,10 +4,11 @@ namespace CrudBuilder\Services;
 
 use CrudBuilder\CRUDBuilder;
 use CrudBuilder\Traits\FilesHandler;
+use CrudBuilder\Traits\PasswordsHandler;
 
 class EditRecordService
 {
-    use FilesHandler;
+    use FilesHandler, PasswordsHandler;
 
     /**
      * class constructor
@@ -36,12 +37,12 @@ class EditRecordService
         }
 
         $syncedRelation = $this->builder->getSyncedRelations();
-        $fileNames = $this->getFilesNames($this->builder->updateInputs);
-        $input = $request->except($syncedRelation + $fileNames);
+        $filesNames = $this->getFilesNames($this->builder->updateInputs);
+        $input = $this->hashPasswords($this->builder->createInputs, $request->except($syncedRelation + $filesNames));
         $resource = $this->builder->resourceClass::findOrFail($id);
         $resource->update($input);
         $this->builder->sync($resource, $request->only($syncedRelation));
-        $this->updateFiles($fileNames, $this->builder->resourceNamePlural, $resource, $request);
+        $this->updateFiles($filesNames, $this->builder->resourceNamePlural, $resource, $request);
 
         return redirect($this->builder->route)->with('success', $this->builder->resourceName.' information was updated successfully');
     }
