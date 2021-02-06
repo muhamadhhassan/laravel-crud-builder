@@ -11,7 +11,7 @@ trait SyncedRelation
     /**
      * The many to many relations that will require syncing.
      *
-     * @var \Illuminate\Support\Collection
+     * @var array
      */
     public $syncedEntities = [];
 
