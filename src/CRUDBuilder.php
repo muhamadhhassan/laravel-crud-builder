@@ -10,11 +10,11 @@ class CRUDBuilder
     use RequestValidator, SyncedRelation;
 
     /**
-     * The resource namespace form example App\Models\User.
+     * The resource class for example App\Models\User.
      *
      * @var string
      */
-    public $resource;
+    public $resourceClass;
 
     /**
      * The singular name of the resource for example user.
@@ -22,6 +22,13 @@ class CRUDBuilder
      * @var string
      */
     public $resourceName;
+
+    /**
+     * an instance of the crud resource
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    public $resource;
 
     /**
      * The plural name of the resource for example users.
@@ -40,7 +47,7 @@ class CRUDBuilder
     /**
      * The route of the resource.
      *
-     * @var Illuminate\Http\Request
+     * @var \Illuminate\Http\Request
      */
     public $request;
 
@@ -96,20 +103,20 @@ class CRUDBuilder
     /**
      * Sets the namespace of the CRUD resource.
      *
-     * @param string $resourceNamespace
+     * @param string $class
      * @return \CRUDBuilder
      */
-    public function setResource(string $resourceNamespace)
+    public function setResourceClass(string $class)
     {
-        if (! class_exists($resourceNamespace)) {
-            throw new \Exception("The model '{$resourceNamespace}' does not exist.", 500);
+        if (! class_exists($class)) {
+            throw new \Exception("The model '{$class}' does not exist.", 500);
         }
 
-        if (! is_subclass_of((new $resourceNamespace()), 'Illuminate\Database\Eloquent\Model')) {
-            throw new \Exception("The class '{$resourceNamespace}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
+        if (! is_subclass_of((new $class()), 'Illuminate\Database\Eloquent\Model')) {
+            throw new \Exception("The class '{$class}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
         }
 
-        $this->resource = $resourceNamespace;
+        $this->resourceClass = $class;
 
         return $this;
     }
