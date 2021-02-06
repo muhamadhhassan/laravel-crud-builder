@@ -2,8 +2,9 @@
 
 namespace CrudBuilder;
 
-use CrudBuilder\Traits\RequestValidator;
 use CrudBuilder\Traits\SyncedRelation;
+use CrudBuilder\Traits\RequestValidator;
+use CrudBuilder\Exceptions\InvalidArgumentException;
 
 class CRUDBuilder
 {
@@ -109,11 +110,11 @@ class CRUDBuilder
     public function setResourceClass(string $class)
     {
         if (! class_exists($class)) {
-            throw new \Exception("The model '{$class}' does not exist.", 500);
+            throw new InvalidArgumentException("The model '{$class}' does not exist.", 500);
         }
 
         if (! is_subclass_of((new $class()), 'Illuminate\Database\Eloquent\Model')) {
-            throw new \Exception("The class '{$class}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
+            throw new InvalidArgumentException("The class '{$class}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
         }
 
         $this->resourceClass = $class;
@@ -161,7 +162,7 @@ class CRUDBuilder
         $complete_route = $route.'.index';
 
         if (! \Route::has($complete_route)) {
-            throw new \Exception('There are no routes for this route name.', 404);
+            throw new InvalidArgumentException('There are no routes for this route name.', 404);
         }
 
         $this->route = route($complete_route, $params);
@@ -210,7 +211,7 @@ class CRUDBuilder
             if ($input instanceof \CrudBuilder\Helpers\Forms\Input) {
                 array_push($this->createInputs, $input);
             } else {
-                throw new \Exception('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
+                throw new InvalidArgumentException('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
             }
         }
 
@@ -235,7 +236,7 @@ class CRUDBuilder
             if ($input instanceof \CrudBuilder\Helpers\Forms\Input) {
                 array_push($this->updateInputs, $input);
             } else {
-                throw new \Exception('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
+                throw new InvalidArgumentException('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
             }
         }
 
