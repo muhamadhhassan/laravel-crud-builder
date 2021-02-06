@@ -2,14 +2,19 @@
 
 namespace CrudBuilder\Controllers;
 
-use Illuminate\Http\Request;
 use CrudBuilder\CRUDBuilder;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use CrudBuilder\Services\CreateRecordService;
+use CrudBuilder\Services\EditRecordService;
 
 abstract class CRUDController extends Controller
 {
     protected $crudBuilder;
 
+    /**
+     * Class constructor.
+     */
     public function __construct()
     {
         if (! $this->crudBuilder) {
@@ -24,8 +29,18 @@ abstract class CRUDController extends Controller
         }
     }
 
+    /**
+     * Setting up resource data.
+     *
+     * @return void
+     */
     abstract public function setup();
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $this->crudBuilder->canOrFail('index');
@@ -38,11 +53,16 @@ abstract class CRUDController extends Controller
         $data['canCreate'] = $this->crudBuilder->can('create');
         $data['canEdit'] = $this->crudBuilder->can('edit');
         $data['canDelete'] = $this->crudBuilder->can('delete');
-        $collection = $this->crudBuilder->resource::paginate(10);
+        $collection = $this->crudBuilder->resourceClass::paginate(10);
 
         return view('admin.crud.index', compact('data', 'collection'));
     }
 
+    /**
+     * Show the form of creating a new resource.
+     *
+     * @return void
+     */
     public function create()
     {
         $this->crudBuilder->canOrFail('create');
@@ -55,32 +75,41 @@ abstract class CRUDController extends Controller
         return view(config('crudbuilder.views.pages.create'), compact('pageTitle', 'pageDescription', 'fields', 'saveAction'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
-    {
+    {   
         $this->crudBuilder->canOrFail('create');
-        $validator = $this->crudBuilder->validator($request);
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator);
-        }
-
-        $syncedRelation = $this->crudBuilder->getSyncedRelations();
-        $input = $request->except($syncedRelation);
-        $resource = $this->crudBuilder->resource::create($input);
-
-        $this->crudBuilder->attach($resource, $request->only($syncedRelation));
-
-        return redirect($this->crudBuilder->route)->with('success', $this->crudBuilder->resourceName.' Was created successfully');
+        
+        return (new CreateRecordService($this->crudBuilder))->save();
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function show()
     {
     }
 
+    /**
+     * Show the form for editing the specified resources.
+     *
+     * @param string $id
+     * 
+     * @return \Illuminate\Http\Response 
+     */
     public function edit($id)
     {
         $this->crudBuilder->canOrFail('edit');
 
-        $resource = $this->crudBuilder->resource::findOrFail($id);
+        $resource = $this->crudBuilder->resourceClass::findOrFail($id);
         $recognizedBy = $this->crudBuilder->recognizedBy;
 
         $pageTitle = 'Edit '.ucwords($resource->$recognizedBy);
@@ -91,31 +120,36 @@ abstract class CRUDController extends Controller
         return view(config('crudbuilder.views.pages.edit'), compact('resource', 'pageTitle', 'pageDescription', 'fields', 'updateAction'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $id)
     {
         $this->crudBuilder->canOrFail('edit');
-        $validator = $this->crudBuilder->validator($request, $id);
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator);
-        }
 
-        $syncedRelation = $this->crudBuilder->getSyncedRelations();
-        $input = $request->except($syncedRelation);
-        $resource = $this->crudBuilder->resource::findOrFail($id);
-        $resource->update($input);
-        $this->crudBuilder->sync($resource, $request->only($syncedRelation));
-
-        return redirect($this->crudBuilder->route)->with('success', $resource->name.' information was updated successfully');
+        return (new EditRecordService($this->crudBuilder))->update($id);
     }
 
+    /**
+     * Remove the specified resource from storage
+     *
+     * @param string $id
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($id)
     {
         $this->crudBuilder->canOrFail('delete');
-        $resource = $this->crudBuilder->resource::findOrFail($id);
+        $this->crudBuilder->resource = $this->crudBuilder->resourceClass::findOrFail($id);
         $recognizedBy = $this->crudBuilder->recognizedBy;
-        $name = $resource->$recognizedBy;
+        $name = $this->crudBuilder->resource->$recognizedBy;
 
-        $resource->delete();
+        $this->crudBuilder->resource->delete();
 
         return redirect($this->crudBuilder->route)->with('success', $name.' was deleted successfully');
     }
