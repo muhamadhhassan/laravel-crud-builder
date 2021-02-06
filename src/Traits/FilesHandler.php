@@ -36,7 +36,7 @@ trait FilesHandler
     {
         foreach($files as $filename) {
             if($request->hasFile($filename)) {
-                $resource->$filename = $this->save($request->file($filename), $directory);
+                $resource->$filename = $this->saveFile($request->file($filename), $directory);
             }
         }
 
@@ -57,8 +57,8 @@ trait FilesHandler
     {
         foreach($files as $filename) {
             if($request->hasFile($filename)) {
-                $this->delete($resource, $filename); 
-                $resource->$filename = $this->save($request->file($filename), $directory);
+                $this->deleteFile($resource, $filename); 
+                $resource->$filename = $this->saveFile($request->file($filename), $directory);
             }
         }
 
@@ -73,7 +73,7 @@ trait FilesHandler
      * 
      * @return string
      */
-    protected function save(UploadedFile $file, string $directory)
+    protected function saveFile(UploadedFile $file, string $directory)
     {
         return $file->store($directory, $this->getDisk());
     }
@@ -86,7 +86,7 @@ trait FilesHandler
      * 
      * @return bool
      */
-    protected function delete(Model $resource, string $file)
+    protected function deleteFile(Model $resource, string $file)
     {
         return Storage::disk($this->getDisk())->delete($resource->$file);
     }
