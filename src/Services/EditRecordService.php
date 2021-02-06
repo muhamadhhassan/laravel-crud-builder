@@ -3,22 +3,22 @@
 namespace CrudBuilder\Services;
 
 use CrudBuilder\CRUDBuilder;
-use CrudBuilder\Traits\FilesHandler;
-use CrudBuilder\Traits\PasswordsHandler;
-use CrudBuilder\Traits\SyncedRelation;
+use Illuminate\Http\Request;
+use CrudBuilder\Foundation\Form;
+use CrudBuilder\Foundation\Resource;
 
-class EditRecordService
+class EditRecordService extends CrudService
 {
-    use FilesHandler, PasswordsHandler, SyncedRelation;
-
     /**
-     * class constructor
+     * Class constructor.
      *
-     * @param \CrudBuilder\CRUDBuilder $builder
+     * @param \CrudBuilder\Foundation\Resource $resource
+     * @param \CrudBuilder\Foundation\Form $form
+     * @param \Illuminate\Http\Request $request
      */
-    public function __construct(CRUDBuilder $builder)
+    public function __construct(Resource $resource, Form $form, Request $request)
     {
-        $this->builder = $builder;
+        parent::__construct($resource, $form, $request);
     }
 
     /**
@@ -30,21 +30,22 @@ class EditRecordService
      */
     public function update(string $id)
     {
-        $request = $this->builder->request;
-        $validator = $this->builder->validator($request, $id);
+        $request = $this->request;
+        $resource = $this->resource;
+        $validator = $this->form->validator($request, $id);
 
         if($validator->fails()) {
             return redirect()->back()->withErrors($validator);
         }
 
-        $syncedRelation = $this->getSyncedRelationsNames($this->builder->syncedEntities);
-        $filesNames = $this->getFilesNames($this->builder->updateInputs);
-        $input = $this->hashPasswords($this->builder->createInputs, $request->except($syncedRelation + $filesNames));
-        $resource = $this->builder->resourceClass::findOrFail($id);
-        $resource->update($input);
-        $this->sync($resource, $request->only($syncedRelation), $this->builder->syncedEntities);
-        $this->updateFiles($filesNames, $this->builder->resourceNamePlural, $resource, $request);
+        $syncedRelation = $this->getSyncedRelationsNames($resource->syncedEntities);
+        $filesNames = $this->getFilesNames($this->form->updateInputs);
+        $input = $this->hashPasswords($this->form->updateInputs, $request->except($syncedRelation + $filesNames));
+        $instance = $resource->className::findOrFail($id);
+        $instance->update($input);
+        $this->sync($instance, $request->only($syncedRelation), $resource->syncedEntities);
+        $this->updateFiles($filesNames, $resource->namePlural, $instance, $request);
 
-        return redirect($this->builder->route)->with('success', $this->builder->resourceName.' information was updated successfully');
+        return redirect($resource->getRouteName())->with('success', $resource->name.' information was updated successfully');
     }
 }

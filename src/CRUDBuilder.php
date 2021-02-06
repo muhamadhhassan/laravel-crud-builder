@@ -2,127 +2,55 @@
 
 namespace CrudBuilder;
 
-use CrudBuilder\Helpers\SyncedEntity;
-use CrudBuilder\Traits\RequestValidator;
-use CrudBuilder\Exceptions\InvalidArgumentException;
+use CrudBuilder\Foundation\Form;
+use CrudBuilder\Foundation\Listing;
+use CrudBuilder\Foundation\Resource;
 class CRUDBuilder
 {
-    use RequestValidator;
     /**
-     * The resource class for example App\Models\User.
+     * The resource data
      *
-     * @var string
-     */
-    public $resourceClass;
-
-    /**
-     * The singular name of the resource for example user.
-     *
-     * @var string
-     */
-    public $resourceName;
-
-    /**
-     * an instance of the crud resource
-     *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \CrudBuilder\Foundation\Resource
      */
     public $resource;
 
     /**
-     * The plural name of the resource for example users.
+     * Forms data
      *
-     * @var string
+     * @var \CrudBuilder\Foundation\Form
      */
-    public $resourceNamePlural;
+    public $form;
 
     /**
-     * The route of the resource.
+     * Listing/Indexing data
      *
-     * @var string
+     * @var \CrudBuilder\Foundation\Listing
      */
-    public $route;
+    public $listing;
 
     /**
-     * The route of the resource.
+     * Constructor
      *
-     * @var \Illuminate\Http\Request
+     * @param \CrudBuilder\Foundation\Resource $resource
+     * @param \CrudBuilder\Foundation\Form $form
      */
-    public $request;
-
-    /**
-     * The field that make the resource recognizable like name, title or full_name.
-     *
-     * @var string
-     */
-    public $recognizedBy = 'name';
-
-    /**
-     * The inputs in the creation form.
-     *
-     * @var array
-     */
-    public $createInputs = [];
-
-    /**
-     * The inputs in the edit form.
-     *
-     * @var array
-     */
-    public $updateInputs = [];
-
-    /**
-     * The request used to validate resource creation.
-     *
-     * @var string
-     */
-    public $createRequest;
-
-    /**
-     * The request used to validate resource creation.
-     *
-     * @var string
-     */
-    public $updateRequest;
-
-    /**
-     * The many-to-many relations that will require syncing.
-     *
-     * @var array
-     */
-    public $syncedEntities = [];
-
-    /**
-     * The columns that will be in the index page.
-     *
-     * @var array
-     */
-    public $indexColumns = [];
-
-    /**
-     * The allowed actions on the CRUD.
-     *
-     * @var array
-     */
-    public $actions = ['index', 'create', 'edit', 'delete', 'show'];
+    public function __construct(Resource $resource, Form $form, Listing $listing)
+    {
+        $this->resource = $resource;
+        $this->form = $form;
+        $this->listing = $listing;
+    }
 
     /**
      * Sets the namespace of the CRUD resource.
      *
      * @param string $class
+     * 
      * @return \CRUDBuilder
      */
     public function setResourceClass(string $class)
     {
-        if (! class_exists($class)) {
-            throw new InvalidArgumentException("The model '{$class}' does not exist.", 500);
-        }
-
-        if (! is_subclass_of((new $class()), 'Illuminate\Database\Eloquent\Model')) {
-            throw new InvalidArgumentException("The class '{$class}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
-        }
-
-        $this->resourceClass = $class;
+        $this->resource->setClassName($class);
 
         return $this;
     }
@@ -132,25 +60,12 @@ class CRUDBuilder
      *
      * @param string $single
      * @param string $plural
+     * 
      * @return \CRUDBuilder
      */
     public function setResourceNames(string $single, string $plural)
     {
-        $this->resourceName = $single;
-        $this->resourceNamePlural = $plural;
-
-        return $this;
-    }
-
-    /**
-     * Sets the route to the CRUD resource.
-     *
-     * @param string $route
-     * @return \CRUDBuilder
-     */
-    public function setRoute(string $route)
-    {
-        $this->route = $route;
+        $this->resource->setNames($single, $plural);
 
         return $this;
     }
@@ -160,17 +75,12 @@ class CRUDBuilder
      *
      * @param string $route
      * @param array $params
+     * 
      * @return \CRUDBuilder
      */
     public function setRouteName(string $route, array $params = [])
     {
-        $complete_route = $route.'.index';
-
-        if (! \Route::has($complete_route)) {
-            throw new InvalidArgumentException('There are no routes for this route name.', 404);
-        }
-
-        $this->route = route($complete_route, $params);
+        $this->resource->setRouteName($route, $params);
 
         return $this;
     }
@@ -179,46 +89,26 @@ class CRUDBuilder
      * Set the allowed actions on the CRUD.
      *
      * @param array $actions
+     * 
      * @return \CRUDBuilder
      */
     public function setActions(array $actions)
     {
-        $this->actions = $actions;
+        $this->resource->setActions($actions);
 
         return $this;
-    }
-
-    /**
-     * Returns the resource route.
-     *
-     * @return string
-     */
-    public function getRouteName(): string
-    {
-        return $this->route;
     }
 
     /**
      * Add an input to the create inputs collection.
      *
      * @param mixed $inputs
+     * 
      * @return \CRUDBuilder
      */
     public function addCreateInputs($inputs)
     {
-        if (! is_array($inputs)) {
-            array_push($this->createInputs, $inputs);
-
-            return $this;
-        }
-
-        foreach ($inputs as $input) {
-            if ($input instanceof \CrudBuilder\Helpers\Forms\Input) {
-                array_push($this->createInputs, $input);
-            } else {
-                throw new InvalidArgumentException('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
-            }
-        }
+        $this->form->addCreateInputs($inputs);
 
         return $this;
     }
@@ -227,23 +117,12 @@ class CRUDBuilder
      * Add an input to the update inputs collection.
      *
      * @param mixed $inputs
+     * 
      * @return \CRUDBuilder
      */
     public function addUpdateInputs($inputs)
     {
-        if (! is_array($inputs)) {
-            array_push($this->updateInputs, $inputs);
-
-            return $this;
-        }
-
-        foreach ($inputs as $input) {
-            if ($input instanceof \CrudBuilder\Helpers\Forms\Input) {
-                array_push($this->updateInputs, $input);
-            } else {
-                throw new InvalidArgumentException('Form inputs must be an instance of App\Helpers\CRUD\Forms\Input.php.', 500);
-            }
-        }
+        $this->form->addUpdateInputs($inputs);
 
         return $this;
     }
@@ -252,23 +131,12 @@ class CRUDBuilder
      * Add a column to the index columns collection.
      *
      * @param mixed $columns
+     * 
      * @return \CRUDBuilder
      */
     public function addIndexColumns($columns)
     {
-        if (! is_array($columns)) {
-            array_push($this->indexColumns, $columns);
-
-            return $this;
-        }
-
-        foreach ($columns as $column) {
-            if ($column instanceof \CrudBuilder\Helpers\IndexColumn) {
-                array_push($this->indexColumns, $column);
-            } else {
-                throw new \Exception('Index table columns must be an instance of App\Helpers\CRUD\IndexColumn.php.', 500);
-            }
-        }
+        $this->listing->addColumns($columns);
 
         return $this;
     }
@@ -280,51 +148,55 @@ class CRUDBuilder
      * @param array $properties
      * @param array $pivotProperties
      * @param string $relation
+     * 
      * @return \CRUDBuilder
      */
     public function addSyncedEntity(string $className, array $properties, array $pivotProperties, string $relation, bool $taggable = false)
     {
-        if (! class_exists($className)) {
-            throw new InvalidArgumentException("The model '{$className}' does not exist.", 500);
-        }
+        $this->resource->addSyncedEntity($className, $properties, $pivotProperties, $relation, $taggable);
+        
+        return $this;
+    }
 
-        if (! is_subclass_of((new $className()), 'Illuminate\Database\Eloquent\Model')) {
-            throw new InvalidArgumentException("The class '{$className}' must be an instance of 'Illuminate\Database\Eloquent\Model'", 500);
-        }
-
-        array_push($this->syncedEntities, new SyncedEntity($className, $properties, $pivotProperties, $relation, $taggable));
+    /**
+     * Set store and update form validators.
+     *
+     * @param string $customValidator
+     * 
+     * @return \CrudBuilder\CRUDBuilder
+     */
+    public function setValidator(string $customValidator)
+    {
+        $this->form->setFormValidator($customValidator);
 
         return $this;
     }
 
     /**
-     * Determine if an action is permitted.
+     * Set the store request validation class.
      *
-     * @param string $action
-     * @return bool
+     * @param string $customValidator
+     * 
+     * @return \CRUDBuilder
      */
-    public function can(string $action) : bool
+    public function setStoreValidator(string $customValidator)
     {
-        if (! in_array($action, $this->actions)) {
-            return false;
-        }
+        $this->form->setStoreFormValidator($customValidator);
 
-        return true;
+        return $this;
     }
 
     /**
-     * Determine if an action is permitted. Abort if not.
+     * Set the update request validation class.
      *
-     * @param string|[string] $action
-     *
-     * @return bool|null
+     * @param string $customValidator
+     * 
+     * @return \CRUDBuilder
      */
-    public function canOrFail($action) : ?bool
+    public function setUpdateValidator(string $customValidator)
     {
-        if (! in_array($action, $this->actions)) {
-            abort(403, 'Unauthorized Access');
-        }
+        $this->form->setUpdateFormValidator($customValidator);
 
-        return true;
+        return $this;
     }
 }

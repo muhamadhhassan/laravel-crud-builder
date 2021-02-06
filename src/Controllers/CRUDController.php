@@ -3,6 +3,9 @@
 namespace CrudBuilder\Controllers;
 
 use CrudBuilder\CRUDBuilder;
+use CrudBuilder\Foundation\Form;
+use CrudBuilder\Foundation\Listing;
+use CrudBuilder\Foundation\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use CrudBuilder\Services\CreateRecordService;
@@ -10,23 +13,29 @@ use CrudBuilder\Services\EditRecordService;
 
 abstract class CRUDController extends Controller
 {
-    protected $crudBuilder;
+    protected $builder;
+
+    protected $resource;
+
+    protected $form;
+
+    protected $listing;
 
     /**
      * Class constructor.
      */
     public function __construct()
     {
-        if (! $this->crudBuilder) {
-            $this->crudBuilder = new CRUDBuilder();
+        $this->resource = new Resource();
+        $this->form = new Form();
+        $this->listing = new Listing();
+        $this->builder = new CRUDBuilder($this->resource, $this->form, $this->listing);
 
-            $this->middleware(function ($request, $next) {
-                $this->crudBuilder->request = $request;
-                $this->setup();
+        $this->middleware(function ($request, $next) {
+            $this->setup();
 
-                return $next($request);
-            });
-        }
+            return $next($request);
+        });
     }
 
     /**
@@ -43,17 +52,17 @@ abstract class CRUDController extends Controller
      */
     public function index()
     {
-        $this->crudBuilder->canOrFail('index');
+        $this->resource->canOrFail('index');
 
-        $data['pageTitle'] = ucwords($this->crudBuilder->resourceNamePlural);
-        $data['pageDescription'] = 'List all '.$this->crudBuilder->resourceNamePlural;
-        $data['columns'] = $this->crudBuilder->indexColumns;
-        $data['resourceRoute'] = $this->crudBuilder->route;
-        $data['recognizedBy'] = $this->crudBuilder->recognizedBy;
-        $data['canCreate'] = $this->crudBuilder->can('create');
-        $data['canEdit'] = $this->crudBuilder->can('edit');
-        $data['canDelete'] = $this->crudBuilder->can('delete');
-        $collection = $this->crudBuilder->resourceClass::paginate(10);
+        $data['pageTitle'] = ucwords($this->resource->namePlural);
+        $data['pageDescription'] = 'List all '.$this->resource->namePlural;
+        $data['columns'] = $this->listing->columns;
+        $data['resourceRoute'] = $this->resource->routeName;
+        $data['recognizedBy'] = $this->resource->recognizedBy;
+        $data['canCreate'] = $this->resource->can('create');
+        $data['canEdit'] = $this->resource->can('edit');
+        $data['canDelete'] = $this->resource->can('delete');
+        $collection = $this->resource->className::paginate(10);
 
         return view('admin.crud.index', compact('data', 'collection'));
     }
@@ -65,12 +74,12 @@ abstract class CRUDController extends Controller
      */
     public function create()
     {
-        $this->crudBuilder->canOrFail('create');
+        $this->resource->canOrFail('create');
 
-        $pageTitle = 'New '.ucwords($this->crudBuilder->resourceName);
-        $pageDescription = 'Create new '.$this->crudBuilder->resourceName;
-        $fields = $this->crudBuilder->createInputs;
-        $saveAction = $this->crudBuilder->getRouteName();
+        $pageTitle = 'New '.ucwords($this->resource->name);
+        $pageDescription = 'Create new '.$this->resource->name;
+        $fields = $this->form->createInputs;
+        $saveAction = $this->resource->getRouteName();
 
         return view(config('crudbuilder.views.pages.create'), compact('pageTitle', 'pageDescription', 'fields', 'saveAction'));
     }
@@ -84,9 +93,9 @@ abstract class CRUDController extends Controller
      */
     public function store(Request $request)
     {   
-        $this->crudBuilder->canOrFail('create');
+        $this->resource->canOrFail('create');
         
-        return (new CreateRecordService($this->crudBuilder))->save();
+        return (new CreateRecordService($this->resource, $this->form, $request))->save();
     }
 
     /**
@@ -107,17 +116,18 @@ abstract class CRUDController extends Controller
      */
     public function edit($id)
     {
-        $this->crudBuilder->canOrFail('edit');
+        $this->resource->canOrFail('edit');
 
-        $resource = $this->crudBuilder->resourceClass::findOrFail($id);
-        $recognizedBy = $this->crudBuilder->recognizedBy;
+        $instance = $this->resource->className::findOrFail($id);
+        $recognizedBy = $this->resource->recognizedBy;
 
-        $pageTitle = 'Edit '.ucwords($resource->$recognizedBy);
-        $pageDescription = 'Edit '.ucwords($resource->$recognizedBy).' Information';
-        $fields = $this->crudBuilder->updateInputs;
-        $updateAction = $this->crudBuilder->getRouteName()."/$id";
+        $pageTitle = 'Edit '.ucwords($instance->$recognizedBy);
+        $pageTitle = 'Edit '.ucwords($instance->$recognizedBy);
+        $pageDescription = 'Edit '.ucwords($instance->$recognizedBy).' Information';
+        $fields = $this->form->updateInputs;
+        $updateAction = $this->resource->getRouteName()."/$id";
 
-        return view(config('crudbuilder.views.pages.edit'), compact('resource', 'pageTitle', 'pageDescription', 'fields', 'updateAction'));
+        return view(config('crudbuilder.views.pages.edit'), compact('instance', 'pageTitle', 'pageDescription', 'fields', 'updateAction'));
     }
 
     /**
@@ -130,9 +140,9 @@ abstract class CRUDController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->crudBuilder->canOrFail('edit');
+        $this->resource->canOrFail('edit');
 
-        return (new EditRecordService($this->crudBuilder))->update($id);
+        return (new EditRecordService($this->resource, $this->form, $request))->update($id);
     }
 
     /**
@@ -144,13 +154,13 @@ abstract class CRUDController extends Controller
      */
     public function destroy($id)
     {
-        $this->crudBuilder->canOrFail('delete');
-        $this->crudBuilder->resource = $this->crudBuilder->resourceClass::findOrFail($id);
-        $recognizedBy = $this->crudBuilder->recognizedBy;
-        $name = $this->crudBuilder->resource->$recognizedBy;
+        $this->resource->canOrFail('delete');
+        $instance = $this->builder->resourceClass::findOrFail($id);
+        $recognizedBy = $this->resource->recognizedBy;
+        $name = $instance->$recognizedBy;
 
-        $this->crudBuilder->resource->delete();
+        $instance->delete();
 
-        return redirect($this->crudBuilder->route)->with('success', $name.' was deleted successfully');
+        return redirect($this->resource->getRouteName())->with('success', $name.' was deleted successfully');
     }
 }

@@ -3,29 +3,22 @@
 namespace CrudBuilder\Services;
 
 use CrudBuilder\CRUDBuilder;
-use CrudBuilder\Traits\FilesHandler;
-use CrudBuilder\Traits\PasswordsHandler;
-use CrudBuilder\Traits\SyncedRelation;
+use CrudBuilder\Foundation\Form;
+use CrudBuilder\Foundation\Resource;
+use Illuminate\Http\Request;
 
-class CreateRecordService
+class CreateRecordService extends CrudService
 {
-    use FilesHandler, PasswordsHandler, SyncedRelation;
-
     /**
-     * Undocumented variable
+     * Class constructor.
      *
-     * @var \CrudBuilder\CRUDBUilder
+     * @param \CrudBuilder\Foundation\Resource $resource
+     * @param \CrudBuilder\Foundation\Form $form
+     * @param \Illuminate\Http\Request $request
      */
-    protected $builder;
-
-    /**
-     * class constructor
-     *
-     * @param \CrudBuilder\CRUDBuilder $crudBuilder
-     */
-    public function __construct(CRUDBuilder $crudBuilder)
+    public function __construct(Resource $resource, Form $form, Request $request)
     {
-        $this->builder = $crudBuilder;
+        parent::__construct($resource, $form, $request);
     }
 
     /**
@@ -35,21 +28,22 @@ class CreateRecordService
      */
     public function save()
     {
-        $request = $this->builder->request;
-        $validator = $this->builder->validator($request);
-        
+        $request = $this->request;
+        $resource = $this->resource;
+        $validator = $this->form->validator($request);
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator);
         }
 
-        $syncedRelation = $this->getSyncedRelationsNames($this->builder->syncedEntities);
-        $filesNames = $this->getFilesNames($this->builder->createInputs);
-        $input = $this->hashPasswords($this->builder->createInputs, $request->except($syncedRelation + $filesNames));
-        $resource = $this->builder->resourceClass::create($input);
+        $syncedRelation = $this->getSyncedRelationsNames($resource->syncedEntities);
+        $filesNames = $this->getFilesNames($this->form->createInputs);
+        $input = $this->hashPasswords($this->form->createInputs, $request->except($syncedRelation + $filesNames));
+        $instance = $resource->className::create($input);
         
-        $this->attach($resource, $request->only($syncedRelation), $this->builder->syncedEntities);
-        $this->saveFiles($filesNames, $this->builder->resourceNamePlural, $resource, $request);
+        $this->attach($instance, $request->only($syncedRelation), $resource->syncedEntities);
+        $this->saveFiles($filesNames, $resource->namePlural, $instance, $request);
 
-        return redirect($this->builder->route)->with('success', $this->builder->resourceName.' was created successfully');
+        return redirect($resource->getRouteName())->with('success', $resource->name.' was created successfully');
     }
 }
