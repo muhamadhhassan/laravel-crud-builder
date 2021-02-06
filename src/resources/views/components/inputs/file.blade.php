@@ -1,6 +1,6 @@
 <div class="form-group">
   @if($attributes['label'])
-    <x-crudbuilder::utils.input-label :label="$attributes['label']" :name="$name" :mandatory="$mandatory"/>
+    <x-crudbuilder::utils.input-label :label="$attributes['label']" :name="$attributes['name']" :mandatory="$mandatory"/>
   @endif
   <div></div>
   <div class="custom-file">
