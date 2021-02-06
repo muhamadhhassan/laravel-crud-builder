@@ -2,9 +2,9 @@
 
 namespace CrudBuilder\Views\Components\Inputs;
 
-use Illuminate\View\Component;
+use CrudBuilder\Views\Components\Inputs\InputComponent;
 
-class File extends Component
+class File extends InputComponent
 {
     public $mandatory;
 
@@ -26,5 +26,10 @@ class File extends Component
     public function render()
     {
         return view(config('crudbuilder.views.inputs.file'));
+    }
+
+    public function setPredefinedValue()
+    {
+        return '';
     }
 }
