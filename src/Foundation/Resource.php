@@ -98,6 +98,18 @@ class Resource
     }
 
     /**
+     * Set the resource label
+     *
+     * @param string $name
+     * 
+     * @return void
+     */
+    public function setRecognizedBy(string $name): void
+    {
+        $this->recognizedBy = $name;
+    }
+
+    /**
      * Sets the route to the CRUD resource using named routes.
      *
      * @param string $route

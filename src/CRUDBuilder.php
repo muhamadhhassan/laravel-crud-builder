@@ -71,6 +71,20 @@ class CRUDBuilder
     }
 
     /**
+     * Set the property that the resource is recognized by eg. name, title
+     *
+     * @param string $name
+     * 
+     * @return \CRUDBuilder
+     */
+    public function setResourceRecognizedBy(string $name)
+    {
+        $this->resource->setRecognizedBy($name);
+
+        return $this;
+    }
+
+    /**
      * Sets the route to the CRUD resource using named routes.
      *
      * @param string $route
