@@ -18,7 +18,7 @@
               @if ($columns[$i]->isEscaped)
                 {!! $columns[$i]->getValue($item) !!}
               @else
-                {{ ucwords($columns[$i]->getValue($item)) }}
+                {{ $columns[$i]->getValue($item) }}
               @endif
             </td>
           @endfor
