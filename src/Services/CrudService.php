@@ -41,7 +41,7 @@ class CrudService
      * @param \CrudBuilder\Foundation\Form $form
      * @param \Illuminate\Http\Request $request
      */
-    public function __construct(Resource $resource, Form $form, Request $request)
+    public function __construct(Resource $resource, Form $form, Request $request = null)
     {
         $this->resource = $resource;
         $this->form = $form;
