@@ -9,6 +9,7 @@ use CrudBuilder\Foundation\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use CrudBuilder\Services\CreateRecordService;
+use CrudBuilder\Services\DeleteRecordService;
 use CrudBuilder\Services\EditRecordService;
 
 abstract class CRUDController extends Controller
@@ -154,13 +155,6 @@ abstract class CRUDController extends Controller
      */
     public function destroy($id)
     {
-        $this->resource->canOrFail('delete');
-        $instance = $this->builder->resourceClass::findOrFail($id);
-        $recognizedBy = $this->resource->recognizedBy;
-        $name = $instance->$recognizedBy;
-
-        $instance->delete();
-
-        return redirect($this->resource->getRouteName())->with('success', $name.' was deleted successfully');
+        return (new DeleteRecordService($this->resource, $this->form))->delete($id);
     }
 }
