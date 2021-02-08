@@ -14,7 +14,7 @@ trait FilesHandler
      *
      * @return array
      */
-    public function getFilesNames(array $inputs)
+    protected function getFilesNames(array $inputs)
     {
         return collect($inputs)
             ->filter(fn($input) => $input->type === 'file')
@@ -32,7 +32,7 @@ trait FilesHandler
      * 
      * @return bool
      */
-    public function saveFiles(array $files, string $directory, Model $resource, Request $request)
+    protected function saveFiles(array $files, string $directory, Model $resource, Request $request)
     {
         foreach($files as $filename) {
             if($request->hasFile($filename)) {
@@ -53,7 +53,7 @@ trait FilesHandler
      * 
      * @return bool
      */
-    public function updateFiles(array $files, string $directory, Model $resource, Request $request)
+    protected function updateFiles(array $files, string $directory, Model $resource, Request $request)
     {
         foreach($files as $filename) {
             if($request->hasFile($filename)) {
@@ -63,6 +63,13 @@ trait FilesHandler
         }
 
         return $resource->save();
+    }
+
+    protected function deleteFiles(array $files, Model $resource)
+    {
+        foreach ($files as $filename) {
+            $this->deleteFile($resource, $filename);
+        }
     }
 
     /**
